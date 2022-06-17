@@ -8,16 +8,15 @@ Currently the frontend is Vue.js as a single file, but backend is made with a fr
 ## Prerequisites
 Docker & Docker Compose
 
-## Setup Template
+## Setup
 
 ```
 $ git clone https://github.com/iprogramstuff/docker-django-vue-postgres-template
 $ cd dijkstras-tramways
-```
-
-Setup
-```
 $ docker-compose up --build
 ```
+Please note that matrices building can take up to several minutes.
+
+
 
 Served at 'localhost:8080'
