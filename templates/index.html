@@ -1,0 +1,610 @@
+{% load static %}
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+  <link rel="stylesheet" href="//unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="//unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="//unpkg.com/vue2-leaflet"></script>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <title>TramWay</title>
+</head>
+
+<body>
+  <div id="app">
+    <l-map ref='mapa' id="mapId" @click="mouseOut" style="height: 100%" :options="{ zoomControl: false }" :zoom="zoom" :center="center">
+      <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
+      <l-marker :lat-lng="markerLatLng"></l-marker>
+    </l-map>
+  </div>
+
+  <div id="apps">
+    <sidebar id="sidebar"></sidebar>
+    <routeshow></routeshow>
+  </div>
+  </div>
+</body>
+
+<script type="text/javascript">
+  var icon = L.divIcon({
+    className: 'map-marker',
+    iconSize: [10, 10],
+
+  });
+  var bigicon = L.divIcon({
+    className: 'map-markerbig',
+    iconSize: [23, 23],
+
+
+  });
+  var bigendicon = L.divIcon({
+    className: 'map-markerend',
+    iconSize: [23, 23],
+
+
+  });
+  //setup common data store
+  var EventBus = new Vue();
+  var store = {
+    state: {
+      walkvals: [],
+      startTramStop: "",
+      endTramStop: "",
+      startTramStopLatLng: [],
+      stopTramStopLatLng: [],
+      routeChapterArray: null,
+      startPointLatLng: ['', ''],
+      endPointLatLng: ['', ''],
+      pickedLatLng: [],
+      mouselatlng: []
+    },
+  };
+
+  new Vue({
+    el: '#app',
+    components: {
+      'l-map': window.Vue2Leaflet.LMap,
+      'l-tile-layer': window.Vue2Leaflet.LTileLayer,
+      'l-marker': window.Vue2Leaflet.LMarker
+    },
+    data() {
+      return {
+        url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        attribution: '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+        zoom: 13,
+        polylines: L.featureGroup(),
+        routemarkers: L.featureGroup(),
+        startsetmarkers: L.featureGroup(),
+        endsetmarkers: L.featureGroup(),
+        popuplayer: L.featureGroup(),
+        sharedState: store.state,
+        center: [52.233, 21.00],
+        markerLatLng: L.latLng(51.504, -0.159),
+      }
+    },
+    mounted() {
+      var self = this
+      mapObject = self.$refs.mapa.mapObject
+      // var map = new L.map("map-container",{ zoomControl: false });
+
+   new L.Control.Zoom({ position: 'topright' }).addTo(mapObject);
+      self.polylines.addTo(mapObject);
+      self.routemarkers.addTo(mapObject);
+      self.startsetmarkers.addTo(mapObject);
+      self.endsetmarkers.addTo(mapObject);
+      self.popuplayer.addTo(mapObject);
+      self.routemarkers.clearLayers();
+
+
+
+      mapObject.addEventListener('mousemove', function(ev) {
+        store.state.mouselatlng = [ev.latlng.lat, ev.latlng.lng]
+      });
+
+
+
+
+      //place marker on chosen TramStop's location
+      EventBus.$on('setStart', () => {
+        self.startsetmarkers.clearLayers();
+        self.dropStartMarker(store.state.startTramStopLatLng, self.startsetmarkers)
+        mapObject.setView(store.state.startTramStopLatLng, 15);
+      });
+
+      EventBus.$on('setEnd', () => {
+        self.endsetmarkers.clearLayers();
+        self.dropStopMarker(store.state.stopTramStopLatLng, self.endsetmarkers)
+        mapObject.setView(store.state.stopTramStopLatLng, 15);
+      });
+
+
+
+      // Create popupp on right-click at mouse location
+      document.getElementById("mapId").addEventListener("contextmenu", function(event) {
+        event.preventDefault();
+        store.state.pickedLatLng = store.state.mouselatlng
+        self.popuplayer.clearLayers();
+
+        var popupContent1 = '<div><div id="butstart"><span class="starticona diricon"></span>set start here</div><div id="butend"><span class="starticonb diricon"></span>set end here</div></div>';
+
+        popup1 = new L.Popup();
+        popup1.setLatLng(store.state.pickedLatLng);
+        popup1.setContent(popupContent1);
+        popup1.addTo(self.popuplayer)
+        document.getElementById("butstart").addEventListener("click", function() {
+          self.startsetmarkers.clearLayers();
+          self.dropStartMarker(store.state.pickedLatLng, self.startsetmarkers);
+          EventBus.$emit('pickStartPointLatLng');
+          popup1.remove()
+          if (self.sharedState.routeChapterArray != null){
+            EventBus.$emit('fetchh');
+          }
+        })
+        document.getElementById("butend").addEventListener("click", function() {
+          self.endsetmarkers.clearLayers();
+          self.dropStopMarker(store.state.pickedLatLng, self.endsetmarkers)
+
+          EventBus.$emit('pickEndPointLatLng');
+          popup1.remove()
+          if (self.sharedState.routeChapterArray != null){
+            EventBus.$emit('fetchh');
+          }
+        })
+        return false;
+      })
+
+
+      EventBus.$on('gotAPI', () => {
+        document.getElementById('find-route').disabled = false;
+                document.getElementById('sidebar-search').disabled = false;
+                        document.getElementById('sidebar-search_two').disabled = false;
+        self.routemarkers.clearLayers();
+        // self.startsetmarkers.clearLayers();
+        // self.endsetmarkers.clearLayers();
+        self.polylines.clearLayers();
+
+
+
+
+        store.state.routeChapterArray.forEach(el => {
+          el.stopslist.forEach(each => {
+            var currMarker = L.marker(each[0], {
+              icon: icon
+            }).setOpacity(0.9).addTo(self.routemarkers);
+            currMarker.getElement().style.border = '3px solid ' + el.color;
+          })
+        })
+
+        // self.dropStartMarker(store.state.routeChapterArray[0].stopslist[0][0], self.routemarkers)
+        // self.dropStopMarker(store.state.routeChapterArray.slice(-1)[0].stopslist.slice(-1)[0][0], self.routemarkers)
+        // store.state.routeChapterArray.slice(-1)[0].color
+        store.state.routeChapterArray.forEach(el => {
+          if (el.line == "walk") {
+            L.polyline(el.stopslist.map(x => x[0]), {
+              color: "#808080",
+              dashArray: 4,
+              opacity: 0.9
+            }).addTo(self.polylines);
+          } else {
+
+            L.polyline(el.stopslist.map(x => x[0]), {
+              color: el.color,
+              weight: 6,
+              opacity: 0.9
+
+            }).addTo(self.polylines);
+          }
+        })
+
+
+        mapObject.fitBounds(self.polylines.getBounds().pad(1), {
+          maxZoom: 13
+        });
+      });
+
+    },
+
+    methods: {
+      dropStartMarker(position, layer) {
+        var startMarker = L.marker(position, {
+          icon: bigicon
+        }).addTo(layer)
+        startMarker.setZIndexOffset(1000);
+        startMarker.getElement().style.backgroundColor = "white";
+
+        // startMarker.getElement().style.border = '4px solid white';
+        // var markerContent = document.createTextNode("A");
+        // startMarker.getElement().appendChild(markerContent);
+      },
+      dropStopMarker(position, layer) {
+        var stopMarker = L.marker(position, {
+          icon: bigendicon
+        }).addTo(layer)
+        stopMarker.setZIndexOffset(1000);
+        stopMarker.getElement().style.backgroundColor = 'white';
+
+        // stopMarker.getElement().style.border = '4px solid white';
+        // var markerContent = document.createTextNode("B");
+        // stopMarker.getElement().appendChild(markerContent);
+      },
+      mouseOut() {
+        document.getElementById('first_column').style.display = "none";
+        document.getElementById('second_column').style.display = "none";
+      }
+    }
+  });
+
+
+  Vue.component('routeshow', {
+    delimiters: ['{(', ')}'],
+    data: () => {
+      return {
+        sharedState: store.state,
+        content: null,
+        trippTime: 0,
+        startime: 0,
+        endtime: 0,
+        starttrip: null,
+        interval: null,
+        currtime: null,
+        lasttime: null,
+      }
+    },
+    template:
+
+      `
+      <div id="routeshowContainer" >
+      <div class="routeHeader">
+      <div class="routeHeaderLeft"><div id="timec" v-if="starttrip < 60 && starttrip > 0" class="timewrapper">starts in:<div > <div class="timediv shineanim">{(starttrip)}</div> min</div></div><div v-else-if="starttrip < 1" id="departed"><div>departed</div> <div>:(</div></div>
+      <div v-else class="timewrapper">start at:<div > <div class="timediv">{(this.startime)}</div></div></div></div>
+
+      <div class="routeHeaderRight">
+      <div class="routeVehicles">
+      <div class="vforicons" v-for="each in content">
+
+      <div class="vif" v-if="each.line != 'walk'" v-bind:style="{'border-bottom':' 2px solid '+each.color}">
+    <div class="iconWrapper"><div class="tramIcon" ></div></div>
+    <div class="aftericon">{(each.line_number)}</div>
+</div>
+    </div>
+    <div class="totaltime">{(this.trippTime)} min</div></div>
+      <div class="timeline">
+       <div ><div class="divinline" v-for="e in content" v-if="e ===content[0] && e.triptime > 0 && e.line === 'walk'"><div class="walkIcon"></div><div class="aftericon">{(e.triptime)} min</div></div><span class="timess">{(this.startime)} - {(this.endtime)}</span><div class="divinline" v-for="e in content" v-if="e ===content[content.length-1] && e.triptime > 0  && e.line === 'walk'"><div class="walkIcon"></div><div class="aftericon">{(e.triptime)} min</div></div></div>
+      </div>
+    </div>
+
+    </div>
+<div class="routeTable">
+      <table>
+      <tbody v-for="each,index in content" >
+      <tr >
+      <td><div class="chapterTime"><div v-if="each == content[0]" class="starticona clasleft"></div><span>{(each.start_time)}</span></div></td>
+      <td>{(each.start)}</td>
+      </tr>
+      <tr >
+      <td class="vehicleBar" v-if="each.line == 'walk'" ><div v-bind:style="{ 'background-color': '#A0A0A0'}" class="chapterVehicle"><div class="iconWrapper"> <div  class="walkIcon"></div></div></div></td>
+        <td class="vehicleBar" v-else ><div v-bind:style="{ 'background-color': each.color }" class="chapterVehicle"><div class="iconWrapper">  <div class="tramIcon"></div><div class="aftertram">{(each.line_number)}</div></div></div></td>
+
+        <td v-if="each.line == 'walk'"><div class="chapterLineInfo"><div></div><div>{(each.triptime)} min</div></div></td>
+      <td v-else-if="each.line != 'walk'"> <div class="chapterLineInfo"> <div>Direction: {(each.line_direction)}</div><div>{(each.triptime)} min</div></div><div class="openstops"><div class="clickable " :id="'open'+index" @click="openStops(index)">{(each.stopslist.length)} stops</div><div class="stoplist clickable" @click="closeStops(index)" :id="index" style="display:none;"><div v-for="leach in each.stopslist">{(leach[2])} {(leach[1])}</div></div></div></td>
+      </tr>
+      <tr class="lastbar" >
+      <td><div class="chapterTime"><div v-if="each == content[content.length-1]" class="starticonb clasleft"></div><span>{(each.end_time)}</span></div></td>
+      <td>{(each.end)}</td>
+      </tr>
+      </tbody>
+      </table>
+      </div>
+
+      </div></div>
+  `,
+    mounted() {
+      self = this
+      document.getElementById('routeshowContainer').style.display = "none";
+
+      EventBus.$on('timesup', () => {
+        clearInterval(self.interval)
+
+
+      })
+      EventBus.$on('gotAPI', () => {
+        self.trippTime = store.state.walkvals[4]
+        self.starttrip = store.state.walkvals[6]
+        document.getElementById('routeshowContainer').style.display = "block";
+        self.content = store.state.routeChapterArray;
+
+        self.startime = self.content[0].start_time
+        self.endtime = self.content[self.content.length - 1].end_time
+        self.lasttime = Intl.DateTimeFormat(navigator.language, {
+          minute: 'numeric',
+        }).format()
+        clearInterval(self.interval)
+        self.interval = setInterval(() => {
+          // Concise way to format time according to system locale.
+          // In my case this returns "3:48:00 am"
+          self.currtime = Intl.DateTimeFormat(navigator.language, {
+            minute: 'numeric',
+          }).format()
+          if (self.currtime != self.lasttime && self.starttrip > 0) {
+            self.lasttime = self.currtime;
+            self.starttrip -= 1;
+          }
+          else if (self.starttrip == 0){
+            EventBus.$emit('timesup');
+          }
+        }, 5000)
+      })
+    },
+
+    methods: {
+      pickMarker(marker) {
+        EventBus.$emit('pickMarker', marker);
+      },
+      openStops(index) {
+        document.getElementById(index).style.display = "block";
+
+        document.getElementById('open' + index).style.display = "None";
+      },
+      closeStops(index) {
+        document.getElementById(index).style.display = "None";
+
+        document.getElementById('open' + index).style.display = "block";
+      }
+    },
+
+
+  })
+
+
+  Vue.component('sidebar', {
+    delimiters: ['{(', ')}'],
+    data: () => {
+      return {
+        searchterm: '',
+        searchterm_two: '',
+        timeout: null,
+        sharedState: store.state,
+        searchset: [],
+        searchset_two: []
+      }
+    },
+    mounted() {
+      const self = this
+      EventBus.$on('fetchh',() =>{
+
+        self.fetchAPIData()
+
+      });
+      EventBus.$on('pickStartPointLatLng', () => {
+        this.searchterm = "A point on map"
+        store.state.startTramStop = ""
+        store.state.startPointLatLng = store.state.pickedLatLng
+      });
+      EventBus.$on('pickEndPointLatLng', () => {
+        this.searchterm_two = "A point on map"
+        store.state.endTramStop = ""
+        store.state.endPointLatLng = store.state.pickedLatLng
+
+      });
+    },
+    watch: {
+      searchterm() {
+        this.first_col_watch(this.searchterm)
+      },
+      searchterm_two() {
+        this.second_col_watch(this.searchterm_two)
+      }
+    },
+    template:
+
+      `
+        <div id="sidebarContain" >
+        <div class="stopParagraph">
+        <div class="searchContainer">
+    <div class="separator">  <div class="iconContain"><div class="starticonA"></div></div></div>
+            <input readonly onfocus="this.removeAttribute('readonly');" autocomplete="off" id="sidebar-search" @click="first_col_watch(searchterm)" class="stopSearch" type="text" v-model="searchterm" ><div class="separator"> <div v-on:click="clear_Ainput()" id="Apcross"  class="iconContain"><div  id="startRightIcon"></div></div></div></div>
+       <ul id="first_column" class="butColumn">
+                <li class="stopli" v-for="stop in searchset" @click="pickStartingPoint(stop)">
+              <div class="iconWrapper">  <div class="tramIcon"></div></div> <span> {(stop.nameno)}</span>
+                </li>
+            </ul></div>
+
+            <div class="stopParagraph">
+            <div class="searchContainer">
+            <div class="separator">   <div class="iconContain"><div class="starticonb"></div></div></div>
+                <input readonly onfocus="this.removeAttribute('readonly');" autocomplete="off" id="sidebar-search_two" @click="second_col_watch(searchterm_two)" class="stopSearch" type="text" v-model="searchterm_two" ><div class="separator"> <div v-on:click="clear_Binput()" id="Bpcross" class="iconContain"><div id="startRightIcon"></div></div></div></div>
+                <ul id="second_column" class="butColumn">
+                    <li class="stopli" v-for="stop in searchset_two" @click="pickEndingPoint(stop)">
+                <div class="iconWrapper">  <div class="tramIcon"></div></div> <span> {(stop.nameno)}</span>
+                    </li>
+                </ul></div>
+<div class="inputBar">
+            <input type="time" id="stime" :value="(new Date()).toTimeString().substr(0,5)">
+          <button id="find-route" @click="fetchAPIData"><div class="routeicon"></div></button>
+
+</div>
+        </div>
+    `,
+    methods: {
+      clear_Binput() {
+
+        document.getElementById("sidebar-search_two").value = "";
+        this.searchterm_two = ""
+        document.getElementById("Bpcross").style.display = "none";
+        document.getElementById('second_column').style.display = "none";
+      },
+      clear_Ainput() {
+
+        document.getElementById("sidebar-search").value = "";
+        this.searchterm = ""
+        document.getElementById("Apcross").style.display = "none";
+        document.getElementById('first_column').style.display = "none";
+      },
+      first_col_watch(searchterm) {
+        var self = this
+        document.getElementById('second_column').style.display = "none";
+        if (self.searchterm.length > 0) {
+          document.getElementById("Apcross").style.display = "block";
+        }
+        clearTimeout(self.timeout);
+
+        self.timeout = setTimeout(() => {
+          if (self.searchterm.length > 1 && self.searchterm !== "A point on map") {
+            document.getElementById('first_column').style.display = "block";
+            self.searchset = self.FetchSearchStops(0, self.searchterm);
+
+          } else if (self.searchterm.length == 0 && {{fromlist}}.length > 0) {
+            document.getElementById('first_column').style.display = "block";
+            self.searchset = self.FetchSearchStops(1, {{fromlist}});
+          }
+        }, 1000);
+      },
+      second_col_watch(searchterm_two) {
+        var self = this
+        clearTimeout(self.timeout);
+        if (self.searchterm_two.length > 0) {
+          document.getElementById("Bpcross").style.display = "block";
+        }
+        self.timeout = setTimeout(() => {
+          if (self.searchterm_two.length > 1 && self.searchterm_two !== "A point on map") {
+            document.getElementById('second_column').style.display = "block";
+            self.searchset_two = self.FetchSearchStops(0, self.searchterm_two);
+          } else if (self.searchterm_two.length == 0 && {{tolist}}.length > 0) {
+            document.getElementById('second_column').style.display = "block";
+            self.searchset_two = self.FetchSearchStops(1, {{tolist}});
+          }
+        }, 1000);
+      },
+
+      fetchAPIData() {
+        document.getElementById('find-route').disabled = true;
+        document.getElementById("sidebar-search").disabled = true;
+        document.getElementById("sidebar-search_two").disabled = true;
+        var self = this
+        var sp = store.state.startTramStop;
+        var ep = store.state.endTramStop;
+        var sll = store.state.startPointLatLng;
+        var ell = store.state.endPointLatLng;
+        var colorcodes = ["#C369F6", "#00c7ba", "#FD0F7E", "#E50C06", "#82DC1F", "#2D45F9"]
+        var colorit = 0
+        var tt = document.getElementById('stime').value;
+        store.state.routeChapterArray = [];
+        fetch('/api/v1.0/?' + new URLSearchParams({
+            spoint: sp,
+            epoint: ep,
+            slat: sll[0],
+            slong: sll[1],
+            elat: ell[0],
+            elong: ell[1],
+            stime: tt + ':00',
+          }))
+
+          .then(response => response.json())
+          .then(response => {
+            for (var k in response) {
+              if (Array.isArray(response[k])) {
+                store.state.walkvals = response[k]
+              } else {
+                if (response[k].line == "walk") {
+                  response[k].color = "#808080"
+                } else {
+                  response[k].color = colorcodes[colorit]
+                  colorit += 1
+                }
+                store.state.routeChapterArray.push(response[k]);
+              }
+            }
+            if (self.searchterm == 'A point on map') {
+
+              store.state.routeChapterArray.unshift({
+                "color": store.state.routeChapterArray[0].color,
+                "end": "startowakupa",
+                "end_time": "11:42",
+                "line": "walk",
+                "line-pk": 898,
+                "line_direction": "Gocławek 06",
+                "line_number": 24,
+                "start": "Point on map",
+                "start_time": store.state.walkvals[2],
+                "stopslist": [
+                  [store.state.startPointLatLng, "Point on map", "11:38"], store.state.routeChapterArray[0].stopslist[0]
+                ],
+                "triptime": store.state.walkvals[0]
+
+              })
+
+            }
+            if (self.searchterm_two == 'A point on map') {
+              store.state.routeChapterArray.push({
+                "color": store.state.routeChapterArray.slice(-1)[0].color,
+                "end": "Point on map",
+                "end_time": store.state.walkvals[3],
+                "line": "walk",
+                "line-pk": 898,
+                "line_direction": "Gocławek 06",
+                "line_number": 24,
+                "start": store.state.routeChapterArray.slice(-1)[0].end,
+                "start_time": store.state.routeChapterArray.slice(-1)[0].end_time,
+                "stopslist": [store.state.routeChapterArray.slice(-1)[0].stopslist.slice(-1)[0],
+                  [store.state.endPointLatLng, "Point on map", "11:38"]
+                ],
+                "triptime": store.state.walkvals[1]
+
+              })
+            }
+            EventBus.$emit('gotAPI');
+          })
+          .catch(err => {
+            console.log(err);
+          })
+      },
+
+      FetchSearchStops(mode, searchq) {
+        let stoparray = [];
+
+        const params = new URLSearchParams('')
+        if (mode == 0) {
+          params.append('q', searchq)
+        } else if (mode == 1) {
+          params.append('qs', searchq)
+        }
+
+        fetch('/api/v1.0/stops/?' + params)
+          .then(response => response.json()
+            .then(data => {
+              window.data = data;
+              Object.values(window.data).forEach(k => {
+
+                stoparray.push(k);
+
+              })
+            }))
+        return stoparray
+
+      },
+      pickStartingPoint(stop) {
+        store.state.startTramStop = stop.id;
+        this.searchterm = stop.nameno;
+        store.state.startTramStopLatLng = [stop.latitude, stop.longitude];
+        EventBus.$emit('setStart');
+        document.getElementById('first_column').style.display = "none";
+      },
+      pickEndingPoint(stop) {
+        store.state.endTramStop = stop.id;
+        this.searchterm_two = stop.nameno;
+        store.state.stopTramStopLatLng = [stop.latitude, stop.longitude];
+        EventBus.$emit('setEnd');
+        document.getElementById('second_column').style.display = "none";
+      }
+    },
+  });
+
+  new Vue({
+    el: '#apps'
+  });
+</script>
+
+</html>
