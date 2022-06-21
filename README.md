@@ -5,6 +5,10 @@ Demo database is provided with Warsaw tram network.
 Currently the frontend is Vue.js as a single file, but backend is made with a frontend container in mind.
 
 
+## Preview
+See it hosted at:
+https://dijkstras-tramways.herokuapp.com
+
 ## Prerequisites
 Docker & Docker Compose
 
