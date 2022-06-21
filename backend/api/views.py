@@ -7,7 +7,7 @@ from rest_framework import generics, permissions, status, mixins, viewsets
 from django.contrib.sessions.models import Session
 from .models import TramStop
 from .serializers import TramStopSerializer
-from .dijkstra import Setup
+from .dijkstra import Driver
 from rest_framework import status
 from django.http import JsonResponse
 from django.views.generic import TemplateView
@@ -73,6 +73,6 @@ class ApiView(APIView):
 
         if end_point != '' and int(end_point) not in request.session['tolist']:
             request.session['tolist'] += [int(end_point)]
-
-        response= Setup(start_point,end_point,start_time,start_lat,start_long,end_lat,end_long)
+        dijsktra_driver = Driver(start_point,end_point,start_time,start_lat,start_long,end_lat,end_long)
+        response= dijsktra_driver.get_dict_w_times()
         return JsonResponse(json.loads(str(response)), status=status.HTTP_200_OK)

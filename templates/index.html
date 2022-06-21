@@ -163,8 +163,6 @@
                 document.getElementById('sidebar-search').disabled = false;
                         document.getElementById('sidebar-search_two').disabled = false;
         self.routemarkers.clearLayers();
-        // self.startsetmarkers.clearLayers();
-        // self.endsetmarkers.clearLayers();
         self.polylines.clearLayers();
 
 
@@ -178,10 +176,6 @@
             currMarker.getElement().style.border = '3px solid ' + el.color;
           })
         })
-
-        // self.dropStartMarker(store.state.routeChapterArray[0].stopslist[0][0], self.routemarkers)
-        // self.dropStopMarker(store.state.routeChapterArray.slice(-1)[0].stopslist.slice(-1)[0][0], self.routemarkers)
-        // store.state.routeChapterArray.slice(-1)[0].color
         store.state.routeChapterArray.forEach(el => {
           if (el.line == "walk") {
             L.polyline(el.stopslist.map(x => x[0]), {
