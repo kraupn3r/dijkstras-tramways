@@ -44,9 +44,8 @@ class TramStopAPIView(generics.ListAPIView):
         if self.request.GET.get('q') != None and self.request.GET.get('q') != '':
             query = self.request.GET.get('q')
 
-            queryset = queryset.filter(
-                Q(name__icontains=query) | Q(stopid__icontains=query)
-            )
+            queryset = queryset.filter(name__icontains=query).order_by('name').distinct('name')
+
         if self.request.GET.get('qs') != None and self.request.GET.get('qs') != '':
             query = self.request.GET.get('qs')
             qlist = [int(e) for e in query.split(',')]
