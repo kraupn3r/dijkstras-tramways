@@ -22,9 +22,21 @@ services:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: pass
       POSTGRES_HOST: db
-    volumes:
-      - .:/app
+    # volumes:
+    #   - .:/app
     ports:
-      - "8080:8080"
+      - "8002:8000"
     depends_on:
       - db
+  vue:
+    build:
+      context: .
+      dockerfile: docker/FrontendDockerfile
+    container_name: dijkstras-tramways-frontend
+    command: ./docker/frontend_setup.sh
+    # volumes:
+    #   - .:/app
+    ports:
+      - "8082:8080"
+    depends_on:
+      - django
