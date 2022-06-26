@@ -577,9 +577,7 @@
           .catch(function (error) {
             console.log(error);
           })
-          .then(function () {
-            return stoparray
-          });
+          return stoparray
       },
       pickStartingPoint(stop) {
         store.state.startTramStop = stop.id;
