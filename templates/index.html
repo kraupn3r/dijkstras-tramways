@@ -7,6 +7,7 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <link rel="icon" href="{% static 'favico.ico' %}" type="image/x-icon">
   <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <link rel="stylesheet" href="//unpkg.com/leaflet/dist/leaflet.css" />
   <script src="//unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="//unpkg.com/vue2-leaflet"></script>
@@ -450,11 +451,11 @@
         self.timeout = setTimeout(() => {
           if (self.searchterm.length > 1 && self.searchterm !== "A point on map") {
             document.getElementById('first_column').style.display = "block";
-            self.searchset = self.FetchSearchStops(0, self.searchterm);
+            self.searchset = self.FetchSearchStops(self.searchterm,'');
 
           } else if (self.searchterm.length == 0 && {{fromlist}}.length > 0) {
             document.getElementById('first_column').style.display = "block";
-            self.searchset = self.FetchSearchStops(1, {{fromlist}});
+            self.searchset = self.FetchSearchStops('', {{fromlist}});
           }
         }, 1000);
       },
@@ -467,10 +468,10 @@
         self.timeout = setTimeout(() => {
           if (self.searchterm_two.length > 1 && self.searchterm_two !== "A point on map") {
             document.getElementById('second_column').style.display = "block";
-            self.searchset_two = self.FetchSearchStops(0, self.searchterm_two);
+            self.searchset_two = self.FetchSearchStops(self.searchterm_two, '');
           } else if (self.searchterm_two.length == 0 && {{tolist}}.length > 0) {
             document.getElementById('second_column').style.display = "block";
-            self.searchset_two = self.FetchSearchStops(1, {{tolist}});
+            self.searchset_two = self.FetchSearchStops('', {{tolist}});
           }
         }, 1000);
       },
@@ -558,28 +559,27 @@
           })
       },
 
-      FetchSearchStops(mode, searchq) {
+      FetchSearchStops(q, qs) {
         let stoparray = [];
-
-        const params = new URLSearchParams('')
-        if (mode == 0) {
-          params.append('q', searchq)
-        } else if (mode == 1) {
-          params.append('qs', searchq)
-        }
-
-        fetch('/api/v1.0/stops/?' + params)
+        axios.get('/api/v1.0/stops/', {
+            params: {
+              q: q,
+              qs: qs,
+            }
+          })
           .then(response => response.json()
             .then(data => {
               window.data = data;
               Object.values(window.data).forEach(k => {
-
                 stoparray.push(k);
-
               })
             }))
-        return stoparray
-
+          .catch(function (error) {
+            console.log(error);
+          })
+          .then(function () {
+            return stoparray
+          });
       },
       pickStartingPoint(stop) {
         store.state.startTramStop = stop.id;
