@@ -568,8 +568,8 @@
             }
           })
           .then(response => response.data)
-            .then(data => {
-              window.data = data;
+            .then(response.data => {
+              window.data = response.data;
               Object.values(window.data).forEach(k => {
                 stoparray.push(k);
               })
