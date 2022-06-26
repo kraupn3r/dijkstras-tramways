@@ -468,10 +468,10 @@
         self.timeout = setTimeout(() => {
           if (self.searchterm_two.length > 1 && self.searchterm_two !== "A point on map") {
             document.getElementById('second_column').style.display = "block";
-            self.searchset_two = self.FetchSearchStops(self.searchterm_two, '');
+            self.searchset_two = self.FetchSearchStops2(0 , self.searchterm_two);
           } else if (self.searchterm_two.length == 0 && {{tolist}}.length > 0) {
             document.getElementById('second_column').style.display = "block";
-            self.searchset_two = self.FetchSearchStops('', {{tolist}});
+            self.searchset_two = self.FetchSearchStops2(1, {{tolist}});
           }
         }, 1000);
       },
@@ -579,6 +579,29 @@
           })
 
         return stoparray
+      },
+      FetchSearchStops2(mode, searchq) {
+        let stoparray = [];
+
+        const params = new URLSearchParams('')
+        if (mode == 0) {
+          params.append('q', searchq)
+        } else if (mode == 1) {
+          params.append('qs', searchq)
+        }
+
+        fetch('http://localhost:8080/api/stops/?' + params)
+          .then(response => response.json()
+            .then(data => {
+              window.data = data;
+              Object.values(window.data).forEach(k => {
+
+                stoparray.push(k);
+
+              })
+            }))
+        return stoparray
+
       },
       pickStartingPoint(stop) {
         store.state.startTramStop = stop.id;
