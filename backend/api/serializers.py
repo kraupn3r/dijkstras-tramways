@@ -14,9 +14,9 @@ class TramStopSerializer(serializers.ModelSerializer):
     class Meta:
         model = TramStop
         fields = [
-        'id',
-                'name',
-                'nameno',
-                'longitude',
-                'latitude',
-                  ]
+            'id',
+            'name',
+            'nameno',
+            'longitude',
+            'latitude',
+              ]
