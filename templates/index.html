@@ -568,16 +568,16 @@
             }
           })
           .then(response => response.data)
-            .then(response.data => {
-              window.data = response.data;
+            .then(data => {
+              window.data = data;
               Object.values(window.data).forEach(k => {
                 stoparray.push(k);
               })
-            })
+            }).then(return stoparray)
           .catch(function (error) {
             console.log(error);
           })
-          return stoparray
+
       },
       pickStartingPoint(stop) {
         store.state.startTramStop = stop.id;
