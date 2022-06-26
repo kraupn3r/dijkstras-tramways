@@ -489,17 +489,19 @@
         var colorit = 0
         var tt = document.getElementById('stime').value;
         store.state.routeChapterArray = [];
-        fetch('/api/v1.0/?' + new URLSearchParams({
-            spoint: sp,
-            epoint: ep,
-            slat: sll[0],
-            slong: sll[1],
-            elat: ell[0],
-            elong: ell[1],
-            stime: tt + ':00',
-          }))
 
-          .then(response => response.json())
+        axios.get('/api/v1.0/stops/?', {
+            params: {
+              spoint: sp,
+              epoint: ep,
+              slat: sll[0],
+              slong: sll[1],
+              elat: ell[0],
+              elong: ell[1],
+              stime: tt + ':00',
+            }
+          })
+          .then(response => response.data)
           .then(response => {
             for (var k in response) {
               if (Array.isArray(response[k])) {
