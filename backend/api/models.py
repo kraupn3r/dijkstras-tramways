@@ -68,6 +68,13 @@ class AdjacencyMatrixCell(models.Model):
     def __str__(self):
         return "{} {} {} {}".format(self.col, self.row, self.value, self.lines.count())
 
+class LineMatrixCell(models.Model):
+    col = models.ForeignKey(TramStop, on_delete=models.CASCADE, related_name='LineMcol')
+    row = models.ForeignKey(TramStop, on_delete=models.CASCADE, related_name='LineMrow')
+    lines  = models.ManyToManyField(Line)
+
+    class Meta:
+        unique_together = ('col', 'row')
 
 class AdjacencyMatrix(models.Model):
     matrix = models.TextField()

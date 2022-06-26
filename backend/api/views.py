@@ -46,7 +46,6 @@ class TramStopAPIView(generics.ListAPIView):
             query = self.request.GET.get('qs')
             qlist = [int(e) for e in query.split(',')]
             queryset = queryset.filter(pk__in=qlist)
-
         return queryset
 
 
