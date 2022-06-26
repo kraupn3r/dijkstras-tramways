@@ -468,7 +468,7 @@
         self.timeout = setTimeout(() => {
           if (self.searchterm_two.length > 1 && self.searchterm_two !== "A point on map") {
             document.getElementById('second_column').style.display = "block";
-            self.searchset_two = self.FetchSearchStops2(0 , self.searchterm_two);
+            self.searchset_two = self.FetchSearchStops2(0, self.searchterm_two);
           } else if (self.searchterm_two.length == 0 && {{tolist}}.length > 0) {
             document.getElementById('second_column').style.display = "block";
             self.searchset_two = self.FetchSearchStops2(1, {{tolist}});
