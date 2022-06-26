@@ -1,8 +1,5 @@
 from django.db import models
 
-# Create your models here.
-
-
 
 class Line(models.Model):
     number = models.PositiveIntegerField()
@@ -56,17 +53,9 @@ class AdjacencyMatrixCell(models.Model):
 
     class Meta:
         unique_together = ('col', 'row')
-
+        verbose_name_plural = 'Adjacency Matrices'
     def __str__(self):
         return "{} {} {} {}".format(self.col,self.row, self.value, self.lines.count())
-
-class LineMatrixCell(models.Model):
-    col = models.ForeignKey(TramStop, on_delete=models.CASCADE, related_name='LineMcol')
-    row = models.ForeignKey(TramStop, on_delete=models.CASCADE, related_name='LineMrow')
-    lines  = models.ManyToManyField(Line)
-
-    class Meta:
-        unique_together = ('col', 'row')
 
 
 class AdjacencyMatrix(models.Model):
@@ -82,3 +71,4 @@ class LineMatrix(models.Model):
 
     class Meta:
         get_latest_by = 'created_at'
+        verbose_name_plural = 'Line Matrices'
