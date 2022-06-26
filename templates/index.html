@@ -561,7 +561,7 @@
 
       FetchSearchStops(q, qs) {
         let stoparray = [];
-        axios.get('/api/v1.0/stops/', {
+        axios.get('/api/v1.0/stops/?', {
             params: {
               q: q,
               qs: qs,
@@ -590,7 +590,7 @@
           params.append('qs', searchq)
         }
 
-        fetch('/api/v1.0/stops/' + params)
+        fetch('/api/v1.0/stops/?' + params)
           .then(response => response.json()
             .then(data => {
               window.data = data;
