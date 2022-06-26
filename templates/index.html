@@ -567,13 +567,12 @@
               qs: qs,
             }
           })
-          .then(response => response.data.json()
-            .then(data => {
+            .then(response.data => {
               window.data = data;
               Object.values(window.data).forEach(k => {
                 stoparray.push(k);
               })
-            }))
+            })
           .catch(function (error) {
             console.log(error);
           })
