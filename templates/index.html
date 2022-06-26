@@ -590,7 +590,7 @@
           params.append('qs', searchq)
         }
 
-        fetch('http://localhost:8080/api/stops/?' + params)
+        fetch('/api/v1.0/stops/' + params)
           .then(response => response.json()
             .then(data => {
               window.data = data;
