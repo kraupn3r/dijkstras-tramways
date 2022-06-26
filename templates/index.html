@@ -567,7 +567,8 @@
               qs: qs,
             }
           })
-            .then(response.data => {
+          .then(response => response.data)
+            .then(data => {
               window.data = data;
               Object.values(window.data).forEach(k => {
                 stoparray.push(k);
