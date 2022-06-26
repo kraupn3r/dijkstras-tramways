@@ -573,10 +573,10 @@
                 "line-pk": 898,
                 "line_direction": "Gocławek 06",
                 "line_number": 24,
-                "start": "Point on map",
+                "start": self.searchterm,
                 "start_time": store.state.walkvals[2],
                 "stopslist": [
-                  [store.state.startPointLatLng, "Point on map", "11:38"], store.state.routeChapterArray[0].stopslist[0]
+                  [store.state.startPointLatLng, self.searchterm, "11:38"], store.state.routeChapterArray[0].stopslist[0]
                 ],
                 "triptime": store.state.walkvals[0]
 
@@ -586,7 +586,7 @@
             if (self.transportterm_two_bool == false) {
               store.state.routeChapterArray.push({
                 "color": store.state.routeChapterArray.slice(-1)[0].color,
-                "end": "Point on map",
+                "end": self.searchterm_two,
                 "end_time": store.state.walkvals[3],
                 "line": "walk",
                 "line-pk": 898,
