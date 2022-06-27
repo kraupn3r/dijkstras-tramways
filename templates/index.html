@@ -499,7 +499,6 @@
           if (self.searchterm.length > 1 && self.transportterm_bool !== false) {
             document.getElementById('first_column').style.display = "block";
             self.searchset = self.FetchSearchStops(self.searchterm, '');
-
           } else if (self.searchterm.length == 0 && {{fromlist}}.length > 0) {
             document.getElementById('first_column').style.display = "block";
             self.searchset = self.FetchSearchStops('', {{fromlist}});
@@ -516,20 +515,26 @@
           if (self.searchterm_two.length > 1 && self.transportterm_two_bool !== false) {
             document.getElementById('second_column').style.display = "block";
             self.searchset_two = self.FetchSearchStops(self.searchterm_two, '');
+            // self.geocode(self.searchterm_two);
           } else if (self.searchterm_two.length == 0 && {{tolist}}.length > 0) {
             document.getElementById('second_column').style.display = "block";
             self.searchset_two = self.FetchSearchStops('', {{tolist}});
+
           }
         }, 1000);
       },
-
+      async geocode(term){
+   const response = await axios.get('https://nominatim.openstreetmap.org/search?q='+term+',warszawa&format=json')
+   console.log(response.data)
+    // this.searchset_two.unshift(response.data[0].display_name)
+},
       fetchAPIData() {
         document.getElementById('find-route').disabled = true;
         document.getElementById("sidebar-search").disabled = true;
         document.getElementById("sidebar-search_two").disabled = true;
         var self = this
-        var sp = store.state.startTramStop;
-        var ep = store.state.endTramStop;
+        var sp = '';
+        var ep = '';
         var sll = store.state.startPointLatLng;
         var ell = store.state.endPointLatLng;
         var colorcodes = ["#C369F6", "#00c7ba", "#FD0F7E", "#E50C06", "#82DC1F", "#2D45F9"]
@@ -563,7 +568,7 @@
                 store.state.routeChapterArray.push(response[k]);
               }
             }
-            if (self.transportterm_bool == false) {
+            if (response[100][0] > 0) {
 
               store.state.routeChapterArray.unshift({
                 "color": store.state.routeChapterArray[0].color,
@@ -583,7 +588,7 @@
               })
 
             }
-            if (self.transportterm_two_bool == false) {
+            if (response[100][1] > 0) {
               store.state.routeChapterArray.push({
                 "color": store.state.routeChapterArray.slice(-1)[0].color,
                 "end": self.searchterm_two,
@@ -633,6 +638,7 @@
         store.state.startTramStop = stop.id;
         this.searchterm = stop.name;
         store.state.startTramStopLatLng = [stop.latitude, stop.longitude];
+        store.state.endPointLatLng = [stop.latitude, stop.longitude]
         self.transportterm_bool = true
         EventBus.$emit('setStart');
         document.getElementById('first_column').style.display = "none";
@@ -641,6 +647,7 @@
         store.state.endTramStop = stop.id;
         this.searchterm_two = stop.name;
         store.state.stopTramStopLatLng = [stop.latitude, stop.longitude];
+        store.state.endPointLatLng = [stop.latitude, stop.longitude]
         self.transportterm_bool = true
         EventBus.$emit('setEnd');
         document.getElementById('second_column').style.display = "none";
