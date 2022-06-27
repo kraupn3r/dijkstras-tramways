@@ -654,7 +654,7 @@
         store.state.startTramStop = stop.id;
         this.searchterm = stop.name;
         store.state.startTramStopLatLng = [stop.latitude, stop.longitude];
-        store.state.endPointLatLng = [stop.latitude, stop.longitude]
+        store.state.startPointLatLng = [stop.latitude, stop.longitude]
         self.transportterm_bool = true
         EventBus.$emit('setStart');
         document.getElementById('first_column').style.display = "none";
