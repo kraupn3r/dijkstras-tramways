@@ -385,6 +385,17 @@
 
         self.fetchAPIData()
 
+      });      EventBus.$on('lock',() =>{
+        document.getElementById('find-route').disabled = true;
+        document.getElementById("sidebar-search").disabled = true;
+        document.getElementById("sidebar-search_two").disabled = true;
+        store.state.maplock = true;
+      });
+      EventBus.$on('unlock',() =>{
+        document.getElementById('find-route').disabled = false;
+        document.getElementById("sidebar-search").disabled = false;
+        document.getElementById("sidebar-search_two").disabled = false;
+        store.state.maplock = false;
       });
       EventBus.$on('pickStartPointLatLng', () => {
         self.reversegeo(store.state.pickedLatLng)
