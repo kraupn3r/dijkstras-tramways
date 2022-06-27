@@ -61,7 +61,8 @@
       startPointLatLng: ['', ''],
       endPointLatLng: ['', ''],
       pickedLatLng: [],
-      mouselatlng: []
+      mouselatlng: [],
+      maplock: false
     },
   };
 
@@ -127,8 +128,11 @@
 
 
       // Create popupp on right-click at mouse location
+
       document.getElementById("mapId").addEventListener("contextmenu", function(event) {
         event.preventDefault();
+        if (!store.state.maplock){
+
         store.state.pickedLatLng = store.state.mouselatlng
         self.popuplayer.clearLayers();
 
@@ -143,9 +147,6 @@
           self.dropStartMarker(store.state.pickedLatLng, self.startsetmarkers);
           EventBus.$emit('pickStartPointLatLng');
           popup1.remove()
-          if (self.sharedState.routeChapterArray != null){
-            EventBus.$emit('fetchh');
-          }
         })
         document.getElementById("butend").addEventListener("click", function() {
           self.endsetmarkers.clearLayers();
@@ -153,18 +154,14 @@
 
           EventBus.$emit('pickEndPointLatLng');
           popup1.remove()
-          if (self.sharedState.routeChapterArray != null){
-            EventBus.$emit('fetchh');
-          }
+
         })
         return false;
-      })
+      }})
 
 
       EventBus.$on('gotAPI', () => {
-        document.getElementById('find-route').disabled = false;
-        document.getElementById('sidebar-search').disabled = false;
-        document.getElementById('sidebar-search_two').disabled = false;
+        EventBus.$emit('unlock');
         self.routemarkers.clearLayers();
         self.polylines.clearLayers();
         self.startsetmarkers.clearLayers();
@@ -215,10 +212,6 @@
         }).addTo(layer)
         startMarker.setZIndexOffset(1000);
         startMarker.getElement().style.backgroundColor = "white";
-
-        // startMarker.getElement().style.border = '4px solid white';
-        // var markerContent = document.createTextNode("A");
-        // startMarker.getElement().appendChild(markerContent);
       },
       dropStopMarker(position, layer) {
         var stopMarker = L.marker(position, {
@@ -227,9 +220,6 @@
         stopMarker.setZIndexOffset(1000);
         stopMarker.getElement().style.backgroundColor = 'white';
 
-        // stopMarker.getElement().style.border = '4px solid white';
-        // var markerContent = document.createTextNode("B");
-        // stopMarker.getElement().appendChild(markerContent);
       },
       async reversegeo(latlng){
         axios.get('https://nominatim.openstreetmap.org/reverse?', {
@@ -401,12 +391,15 @@
         self.transportterm_bool = false
         store.state.startTramStop = ""
         store.state.startPointLatLng = store.state.pickedLatLng
+       EventBus.$emit('lock');
       });
       EventBus.$on('pickEndPointLatLng', () => {
         self.reversegeo2(store.state.pickedLatLng)
         self.transportterm_two_bool = false
         store.state.endTramStop = ""
         store.state.endPointLatLng = store.state.pickedLatLng
+
+        EventBus.$emit('lock');
 
       });
     },
@@ -466,7 +459,10 @@
           this.display_first = response.data.address.road
           if (response.data.address.house_number) {
             this.display_first += ' ' + response.data.address.house_number
-}
+}            EventBus.$emit('unlock');
+            if (self.sharedState.endPointLatLng[0] != ''){
+              EventBus.$emit('fetchh');
+            }
       },
       async reversegeo2(latlng){
          const response = await axios.get('https://nominatim.openstreetmap.org/reverse?', {
@@ -479,7 +475,10 @@
           this.display_second = response.data.address.road
           if (response.data.address.house_number) {
             this.display_second += ' ' + response.data.address.house_number
-}
+}          EventBus.$emit('unlock');
+          if (self.sharedState.startPointLatLng[0] != ''){
+            EventBus.$emit('fetchh');
+          }
       },
       clear_Binput() {
 
@@ -537,9 +536,7 @@
     // this.searchset_two.unshift(response.data[0].display_name)
 },
       fetchAPIData() {
-        document.getElementById('find-route').disabled = true;
-        document.getElementById("sidebar-search").disabled = true;
-        document.getElementById("sidebar-search_two").disabled = true;
+        EventBus.$emit('lock');
         var self = this
         var sp = '';
         var ep = '';
