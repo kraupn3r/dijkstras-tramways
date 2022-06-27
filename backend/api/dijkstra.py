@@ -226,17 +226,13 @@ class Driver():
                 start_time, '%H:%M:%S') + timedelta(minutes=(int(round(dist * 12, 0))))
             self.firstwalk = int(round(dist * 12, 0))
             self.current_time = current_time.strftime('%H:%M:%S')
-        else:
-            self.first_stop = startstop
-            self.firstwalk = 0
-            self.current_time = start_time
+            self.firstdist = dist
 
         if endstop == '':
             self.last_stop, dist = self.findstop(float(end_long), float(end_lat))
             self.lastwalk = int(round(dist * 12, 0))
-        else:
-            self.last_stop = endstop
-            self.lastwalk = 0
+            self.lastdist = dist
+
         self.current_time = datetime.strptime(self.current_time, '%H:%M:%S')
         self.route, self.path, self.pathfind, self.g = self.get_routes(self.first_stop, self.last_stop)
     # find closest stop to coords
@@ -343,5 +339,5 @@ class Driver():
         ttime = datetime.strptime(etime, '%H:%M') - datetime.strptime(stime, '%H:%M')
         tts = datetime.strptime(stime, '%H:%M') - datetime.strptime(self.start_time, '%H:%M:%S')
         tfn = datetime.strptime(stime, '%H:%M') - datetime.strptime(timezone.localtime().strftime('%H:%M'), '%H:%M')
-        routedict[100] = [self.firstwalk, self.lastwalk, stime, etime,int(ttime.seconds/60),int(tts.seconds/60),int(tfn.seconds/60)]
+        routedict[100] = [self.firstwalk, self.lastwalk, stime, etime,int(ttime.seconds/60),int(tts.seconds/60),int(tfn.seconds/60),self.firstdist,self.lastdist]
         return json.dumps(routedict)

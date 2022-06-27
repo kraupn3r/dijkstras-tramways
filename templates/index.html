@@ -168,7 +168,9 @@
         self.routemarkers.clearLayers();
         self.polylines.clearLayers();
         self.startsetmarkers.clearLayers();
+        self.endsetmarkers.clearLayers();
         self.dropStartMarker(store.state.routeChapterArray[0].stopslist[0][0], self.startsetmarkers)
+        self.dropStopMarker(store.state.routeChapterArray[store.state.routeChapterArray.length-1].stopslist[store.state.routeChapterArray[store.state.routeChapterArray.length-1].stopslist.length-1][0], self.endsetmarkers)
 
 
 
@@ -572,7 +574,7 @@
 
               store.state.routeChapterArray.unshift({
                 "color": store.state.routeChapterArray[0].color,
-                "end": "startowakupa",
+                "end": "startowa",
                 "end_time": "11:42",
                 "line": "walk",
                 "line-pk": 898,
@@ -588,7 +590,7 @@
               })
 
             }
-            if (response[100][1] > 0) {
+            if (response[100][8] > 0.04) {
               store.state.routeChapterArray.push({
                 "color": store.state.routeChapterArray.slice(-1)[0].color,
                 "end": self.searchterm_two,
