@@ -623,6 +623,8 @@
               })
             }
             EventBus.$emit('gotAPI');
+            self.transportterm_two_bool = true;
+            self.transportterm_bool = true;
           })
           .catch(err => {
             console.log(err);
