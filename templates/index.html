@@ -422,16 +422,17 @@
         self = this
       this.geocode_response.every(e =>{
         if(e.class == 'building'){
-          if(self.transportterm_bool){
-          this.searchset_two.unshift({
+          this.searchset.unshift({
             "type": "building",
             "name" : e.display_name.split(',').slice(0,3).toString(),
             "latitude": e.lat,
             'longitude': e.lon
           })
-          return false}
+          return false
+        }
           else{
-            this.searchset.unshift({
+            if(self.transportterm_bool){
+            this.searchset_two.unshift({
               "type": "building",
               "name" : e.display_name.split(',').slice(0,3).toString(),
               "latitude": e.lat,
