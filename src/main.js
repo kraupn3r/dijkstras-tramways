@@ -5,7 +5,7 @@ import store from "./store"
 import router from "./router";
 // import { Icon } from "leaflet";
 
-import VueCookies from 'vue-cookies';
+// import VueCookies from 'vue-cookies';
 // import "leaflet/dist/leaflet.css";
 // delete Icon.Default.prototype._getIconUrl;
 // Icon.Default.mergeOptions({
@@ -16,7 +16,7 @@ import VueCookies from 'vue-cookies';
 //
 
 // Vue.use(VueRouter);
-Vue.use(VueCookies);
+// Vue.use(VueCookies);
 new Vue({
   // router,
   store,
