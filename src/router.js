@@ -1,21 +1,18 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import VueDemo from '@/components/VueDemo'
-import Messages from '@/components/Messages'
-
+import home from "@/pages/home.vue";
 Vue.use(Router)
 
 export default new Router({
   routes: [
-    {
-      path: '/',
-      name: 'home',
-      component: VueDemo
-    },
-    {
-      path: '/messages',
-      name: 'messages',
-      component: Messages
-    }
+    mode: 'History',
+    base: '/app',
+    routes: [
+     {
+       path: '/',
+       name: 'map',
+       component: Map
+     }
+
   ]
 })
