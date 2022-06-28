@@ -1,167 +1,119 @@
+<template>
 
-
-
-
+  <div>
+    <l-map
+      :zoom="zoom"
+      :center="center"
+      style="height: 500px; width: 100%"
+    >
+      <l-tile-layer
+        :url="url"
+        :attribution="attribution"
+      />
+      <l-circle
+        :lat-lng="circle.center"
+        :radius="circle.radius"
+      >
+        <l-popup content="Circle" />
+      </l-circle>
+      <l-rectangle
+        :bounds="rectangle.bounds"
+        :color="rectangle.color"
+      >
+        <l-popup content="Rectangle" />
+      </l-rectangle>
+      <l-polygon
+        :lat-lngs="polygon.latlngs"
+        :color="polygon.color"
+      >
+        <l-popup content="Polygon" />
+      </l-polygon>
+      <l-polyline
+        :lat-lngs="polyline.latlngs"
+        :color="polyline.color"
+      >
+        <l-popup content="polyline" />
+      </l-polyline>
+    </l-map>
+  </div>
+</template>
 
 <script>
-import L from 'leaflet';
-import { LMap, LTileLayer, LMarker } from "vue2-leaflet";
-import "leaflet/dist/leaflet.css";
+import {
+  LMap,
+  LTileLayer,
+  LCircle,
+  LRectangle,
+  LPolygon,
+  LPolyline,
+  LPopup,
+  LTooltip,
+} from "vue2-leaflet";
+import { latLng } from "leaflet";
+
 export default {
-  name: "Map",
+  name: "PopupGeometryTest",
   components: {
-    "l-map": LMap,
-    "l-tile-layer": LTileLayer,
-    LMarker
+    LMap,
+    LTileLayer,
+    LCircle,
+    LRectangle,
+    LPolygon,
+    LPolyline,
+    LPopup,
+    LTooltip,
   },
   data() {
     return {
+      zoom: 11,
+      center: [47.31322, -1.319482],
+      circle: {
+        center: latLng(47.41322, -1.0482),
+        radius: 4500
+      },
+      rectangle: {
+        bounds: [[47.341456, -1.397133], [47.303901, -1.243813]],
+        color: "red"
+      },
+      polygon: {
+        latlngs: [
+          [47.2263299, -1.6222],
+          [47.21024000000001, -1.6270065],
+          [47.1969447, -1.6136169],
+          [47.18527929999999, -1.6143036],
+          [47.1794457, -1.6098404],
+          [47.1775788, -1.5985107],
+          [47.1676598, -1.5753365],
+          [47.1593731, -1.5521622],
+          [47.1593731, -1.5319061],
+          [47.1722111, -1.5143967],
+          [47.1960115, -1.4841843],
+          [47.2095404, -1.4848709],
+          [47.2291277, -1.4683914],
+          [47.2533687, -1.5116501],
+          [47.2577961, -1.5531921],
+          [47.26828069, -1.5621185],
+          [47.2657179, -1.589241],
+          [47.2589612, -1.6204834],
+          [47.237287, -1.6266632],
+          [47.2263299, -1.6222]
+        ],
+        color: "#ff00ff"
+      },
+      polyline: {
+        type: "polyline",
+        latlngs: [
+          [47.334852, -1.509485],
+          [47.342596, -1.328731],
+          [47.241487, -1.190568],
+          [47.234787, -1.358337]
+        ],
+        color: "green"
+      },
       url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-      attribution: '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-      zoom: 13,
-      polylines: L.featureGroup(),
-      routemarkers: L.featureGroup(),
-      startsetmarkers: L.featureGroup(),
-      endsetmarkers: L.featureGroup(),
-      popuplayer: L.featureGroup(),
-      sharedState: store.state,
-      center: [52.233, 21.00],
-      markerLatLng: L.latLng(51.504, -0.159),
-    }
-  },
-  mounted() {
-    var self = this
-    mapObject = self.$refs.mapa.mapObject
-
- new L.Control.Zoom({ position: 'topright' }).addTo(mapObject);
-    self.polylines.addTo(mapObject);
-    self.routemarkers.addTo(mapObject);
-    self.startsetmarkers.addTo(mapObject);
-    self.endsetmarkers.addTo(mapObject);
-    self.popuplayer.addTo(mapObject);
-    self.routemarkers.clearLayers();
-
-
-
-    mapObject.addEventListener('mousemove', function(ev) {
-      store.state.mouselatlng = [ev.latlng.lat, ev.latlng.lng]
-    });
-
-    //place marker on chosen TramStop's location
-    EventBus.$on('setStart', () => {
-      self.startsetmarkers.clearLayers();
-      self.dropStartMarker(store.state.startTramStopLatLng, self.startsetmarkers)
-      mapObject.setView(store.state.startTramStopLatLng, 15);
-    });
-
-    EventBus.$on('setEnd', () => {
-      self.endsetmarkers.clearLayers();
-      self.dropStopMarker(store.state.stopTramStopLatLng, self.endsetmarkers)
-      mapObject.setView(store.state.stopTramStopLatLng, 15);
-    });
-
-
-
-    // Create popupp on right-click at mouse location
-    document.getElementById("mapId").addEventListener("contextmenu", function(event) {
-      event.preventDefault();
-      store.state.pickedLatLng = store.state.mouselatlng
-      self.popuplayer.clearLayers();
-
-      var popupContent1 = '<div><div id="butstart"><span class="starticona diricon"></span>set start here</div><div id="butend"><span class="starticonb diricon"></span>set end here</div></div>';
-
-      popup1 = new L.Popup();
-      popup1.setLatLng(store.state.pickedLatLng);
-      popup1.setContent(popupContent1);
-      popup1.addTo(self.popuplayer)
-      document.getElementById("butstart").addEventListener("click", function() {
-        self.startsetmarkers.clearLayers();
-        self.dropStartMarker(store.state.pickedLatLng, self.startsetmarkers);
-        EventBus.$emit('pickStartPointLatLng');
-        popup1.remove()
-        if (self.sharedState.routeChapterArray != null){
-          EventBus.$emit('fetchh');
-        }
-      })
-      document.getElementById("butend").addEventListener("click", function() {
-        self.endsetmarkers.clearLayers();
-        self.dropStopMarker(store.state.pickedLatLng, self.endsetmarkers)
-
-        EventBus.$emit('pickEndPointLatLng');
-        popup1.remove()
-        if (self.sharedState.routeChapterArray != null){
-          EventBus.$emit('fetchh');
-        }
-      })
-      return false;
-    })
-
-
-    EventBus.$on('gotAPI', () => {
-      document.getElementById('find-route').disabled = false;
-      document.getElementById('sidebar-search').disabled = false;
-      document.getElementById('sidebar-search_two').disabled = false;
-      self.routemarkers.clearLayers();
-      self.polylines.clearLayers();
-      self.startsetmarkers.clearLayers();
-      self.dropStartMarker(store.state.routeChapterArray[0].stopslist[0][0], self.startsetmarkers)
-
-
-
-      store.state.routeChapterArray.forEach(el => {
-        el.stopslist.forEach(each => {
-          var currMarker = L.marker(each[0], {
-            icon: icon
-          }).setOpacity(0.9).addTo(self.routemarkers);
-          currMarker.getElement().style.border = '3px solid ' + el.color;
-        })
-      })
-      store.state.routeChapterArray.forEach(el => {
-        if (el.line == "walk") {
-          L.polyline(el.stopslist.map(x => x[0]), {
-            color: "#808080",
-            dashArray: 4,
-            opacity: 0.9
-          }).addTo(self.polylines);
-        } else {
-
-          L.polyline(el.stopslist.map(x => x[0]), {
-            color: el.color,
-            weight: 6,
-            opacity: 0.9
-
-          }).addTo(self.polylines);
-        }
-      })
-
-
-      mapObject.fitBounds(self.polylines.getBounds().pad(1), {
-        maxZoom: 13
-      });
-    });
-
-  },
-
-  methods: {
-    dropStartMarker(position, layer) {
-      var startMarker = L.marker(position, {
-        icon: bigicon
-      }).addTo(layer)
-      startMarker.setZIndexOffset(1000);
-      startMarker.getElement().style.backgroundColor = "white";
-
-    },
-    dropStopMarker(position, layer) {
-      var stopMarker = L.marker(position, {
-        icon: bigendicon
-      }).addTo(layer)
-      stopMarker.setZIndexOffset(1000);
-      stopMarker.getElement().style.backgroundColor = 'white';
-    },
-    mouseOut() {
-      document.getElementById('first_column').style.display = "none";
-      document.getElementById('second_column').style.display = "none";
-    }
+      attribution:
+        '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+    };
   }
-}
+};
 </script>
