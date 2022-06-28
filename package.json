@@ -11,6 +11,10 @@
     "dev": "vue-cli-service serve --open",
     "lint-fix": "vue-cli-service lint --fix"
   },
+  "engines": {
+"node": "18.0",
+"npm": "6.2.0"
+},
   "dependencies": {
     "axios": "^0.27.0",
     "vue": "^2.6.14",
@@ -31,6 +35,25 @@
     "sass-loader": "^13.0.1",
     "webpack": "^5.73"
   },
+  "babel": {
+  "presets": [
+    "@vue/app"
+  ]
+},
+"eslintConfig": {
+  "root": true,
+  "env": {
+    "node": true
+  },
+  "extends": [
+    "plugin:vue/essential",
+    "eslint:recommended"
+  ],
+  "rules": {},
+  "parserOptions": {
+    "parser": "babel-eslint"
+  }
+},
   "browserslist": [
     "> 1%",
     "last 2 versions",
