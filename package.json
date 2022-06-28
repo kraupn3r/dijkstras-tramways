@@ -12,7 +12,7 @@
     "lint-fix": "vue-cli-service lint --fix"
   },
   "engines": {
-"node": "16.15.1",
+"node": "16.15.1"
 },
   "dependencies": {
     "axios": "^0.27.0",
