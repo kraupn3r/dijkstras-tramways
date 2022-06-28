@@ -1,34 +1,3 @@
-Skip to content
-Product
-Team
-Enterprise
-Explore
-Marketplace
-Pricing
-Search
-Sign in
-Sign up
-Romainpetit
-/
-leaflet-vue
-Public
-Code
-Issues
-Pull requests
-15
-Actions
-Projects
-Wiki
-Security
-Insights
-leaflet-vue/src/components/Map.vue
-@Romainpetit
-Romainpetit Initial commit
-Latest commit c5bb33a on 8 May 2019
- History
- 1 contributor
-33 lines (31 sloc)  776 Bytes
-
 <template>
   <div style="height: 80vh">
     <LMap :zoom="zoom" :center="center">
@@ -44,6 +13,7 @@ Latest commit c5bb33a on 8 May 2019
 
 <script>
 import { LMap, LTileLayer, LMarker } from "vue2-leaflet";
+
 export default {
   name: "Map",
   components: {
@@ -61,17 +31,3 @@ export default {
   }
 };
 </script>
-© 2022 GitHub, Inc.
-Footer navigation
-Terms
-Privacy
-Security
-Status
-Docs
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
-Loading completes
