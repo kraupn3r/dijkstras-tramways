@@ -21,11 +21,12 @@
     "Vue2Leaflet":"2.7.1"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.0.0-rc.12",
-    "@vue/cli-plugin-eslint": "^3.0.0-rc.12",
-    "@vue/cli-plugin-router": "^3.0.0-rc.12",
-    "@vue/cli-plugin-vuex": "^3.0.0-rc.12",
-    "@vue/cli-service": "^3.0.0-rc.12",
+    "@vue/cli-plugin-babel": "^5.0.6",
+    "@vue/cli-plugin-eslint": "^5.0.6",
+    "@vue/cli-plugin-router": "^5.0.6",
+    "@vue/cli-plugin-vuex": "5.0.6",
+    "@vue/cli-service": "^5.0.6",
+    "@babel/eslint-parser": "7.18.2",
     "sass": "^1.53",
     "sass-loader": "^13.0.1",
     "webpack": "^5.73"
