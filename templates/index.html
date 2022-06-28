@@ -549,8 +549,6 @@
       fetchAPIData() {
         EventBus.$emit('lock');
         var self = this
-        var sp = '';
-        var ep = '';
         var sll = store.state.startPointLatLng;
         var ell = store.state.endPointLatLng;
         var colorcodes = ["#C369F6", "#00c7ba", "#FD0F7E", "#E50C06", "#82DC1F", "#2D45F9"]
@@ -560,8 +558,6 @@
 
         axios.get('/api/v1.0/?', {
             params: {
-              spoint: sp,
-              epoint: ep,
               slat: sll[0],
               slong: sll[1],
               elat: ell[0],

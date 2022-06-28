@@ -57,17 +57,15 @@ class ApiView(APIView):
         start_long = request.GET.get('slong')
         end_lat = request.GET.get('elat')
         end_long = request.GET.get('elong')
-        start_point = request.GET.get('spoint', '')
-        end_point = request.GET.get('epoint', '')
         start_time = request.GET.get('stime', '')
 
-        if start_point != '' and int(start_point) not in request.session['fromlist']:
-            request.session['fromlist'] += [int(start_point)]
-
-        if end_point != '' and int(end_point) not in request.session['tolist']:
-            request.session['tolist'] += [int(end_point)]
+        # if start_point != '' and int(start_point) not in request.session['fromlist']:
+        #     request.session['fromlist'] += [int(start_point)]
+        #
+        # if end_point != '' and int(end_point) not in request.session['tolist']:
+        #     request.session['tolist'] += [int(end_point)]
 
         dijsktra_driver = Driver(
-            start_point, end_point, start_time, start_lat, start_long, end_lat, end_long)
+            start_time, start_lat, start_long, end_lat, end_long)
         response = dijsktra_driver.get_dict_w_times()
         return JsonResponse(json.loads(str(response)), status=status.HTTP_200_OK)

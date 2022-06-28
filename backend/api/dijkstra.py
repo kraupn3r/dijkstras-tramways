@@ -211,7 +211,7 @@ class Graph():
 
 
 class Driver():
-    def __init__(self, startstop, endstop, start_time, start_long, start_lat, end_long, end_lat):
+    def __init__(self, start_time, start_long, start_lat, end_long, end_lat):
 
         if start_time == '':
             self.start_time = timezone.now().strftime('%H:%M:%S')
@@ -220,18 +220,17 @@ class Driver():
         else:
             self.start_time = start_time
 
-        if startstop == '':
-            self.first_stop, dist = self.findstop(float(start_long), float(start_lat))
-            current_time = datetime.strptime(
-                start_time, '%H:%M:%S') + timedelta(minutes=(int(round(dist * 12, 0))))
-            self.firstwalk = int(round(dist * 12, 0))
-            self.current_time = current_time.strftime('%H:%M:%S')
-            self.firstdist = dist
 
-        if endstop == '':
-            self.last_stop, dist = self.findstop(float(end_long), float(end_lat))
-            self.lastwalk = int(round(dist * 12, 0))
-            self.lastdist = dist
+        self.first_stop, dist = self.findstop(float(start_long), float(start_lat))
+        current_time = datetime.strptime(
+            start_time, '%H:%M:%S') + timedelta(minutes=(int(round(dist * 12, 0))))
+        self.firstwalk = int(round(dist * 12, 0))
+        self.current_time = current_time.strftime('%H:%M:%S')
+        self.firstdist = dist
+
+        self.last_stop, dist = self.findstop(float(end_long), float(end_lat))
+        self.lastwalk = int(round(dist * 12, 0))
+        self.lastdist = dist
 
         self.current_time = datetime.strptime(self.current_time, '%H:%M:%S')
         self.route, self.path, self.pathfind, self.g = self.get_routes(self.first_stop, self.last_stop)
