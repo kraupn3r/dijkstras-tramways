@@ -19,7 +19,6 @@
   <div id="app">
     <l-map ref='mapa' id="mapId" @click="mouseOut" style="height: 100%" :options="{ zoomControl: false }" :zoom="zoom" :center="center">
       <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
-      <l-marker :lat-lng="markerLatLng"></l-marker>
     </l-map>
   </div>
 
@@ -542,7 +541,10 @@
           if (self.searchterm_two.length > 1 && self.transportterm_two_bool !== false) {
             document.getElementById('second_column').style.display = "block";
             self.searchset_two = self.FetchSearchStops(self.searchterm_two, '');
-            // self.geocode(self.searchterm_two);
+            if (!isNaN(self.searchterm_two.split(' ').slice(-1)) && !isNaN(parseFloat(self.searchterm_two.split(' ').slice(-1))))
+            {
+              self.geocode(self.searchterm_two)
+            }
           } else if (self.searchterm_two.length == 0 && {{tolist}}.length > 0) {
             document.getElementById('second_column').style.display = "block";
             self.searchset_two = self.FetchSearchStops('', {{tolist}});
