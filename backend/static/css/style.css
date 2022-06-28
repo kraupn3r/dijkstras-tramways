@@ -286,7 +286,13 @@ tbody:last-of-type>.lastbar {
   background: url('sprite.png ');
   background-position: 85.034% 52.8%;
 }
-
+.addressIcon {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  background: url('sprite.png ');
+  background-position: 45% 100%;
+}
 .separator {
   width: 50px;
   height: inherit;

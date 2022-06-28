@@ -422,6 +422,7 @@
       this.geocode_response.every(e =>{
         if(e.class == 'building'){
           this.searchset_two.unshift({
+            "type": "building",
             "name" : e.display_name.split(',').slice(0,3).toString(),
             "latitude": e.lat,
             'longitude': e.lon
@@ -452,7 +453,7 @@
                 <input readonly onfocus="this.removeAttribute('readonly');" autocomplete="off" id="sidebar-search_two" @click="second_col_watch(searchterm_two)" class="stopSearch" type="text" v-model="searchterm_two" ><div class="separator"> <div v-on:click="clear_Binput()" id="Bpcross" class="iconContain"><div id="startRightIcon"></div></div></div></div>
                 <ul id="second_column" class="butColumn">
                     <li class="stopli" v-for="stop in searchset_two" @click="pickEndingPoint(stop)">
-                <div class="iconWrapper">  <div class="tramIcon"></div></div> <span> {(stop.name)}</span>
+                <div class="iconWrapper">  <div v-if="stop.type == 'building'" class="addressIcon"></div></div> <span> {(stop.name)}</span>
                     </li>
                 </ul></div>
 <div class="inputBar">
