@@ -539,7 +539,7 @@
           if (self.searchterm.length > 1 && self.transportterm_bool !== false) {
             document.getElementById('first_column').style.display = "block";
             self.searchset = self.FetchSearchStops(self.searchterm, '');
-            if (!isNaN(self.searchterm.split('/').slice().split(' ').slice(-1)) && !isNaN(parseFloat(self.searchterm.split(' ').slice(-1))))
+            if (!isNaN(self.searchterm.split(' ').slice(-1)) && !isNaN(parseFloat(self.searchterm.split(' ').slice(-1))))
             {
               self.geocode(self.searchterm)
             }
@@ -559,7 +559,7 @@
           if (self.searchterm_two.length > 1 && self.transportterm_two_bool !== false) {
             document.getElementById('second_column').style.display = "block";
             self.searchset_two = self.FetchSearchStops(self.searchterm_two, '');
-            if (!isNaN(self.searchterm_two.split('/').slice().split(' ').slice(-1)) && !isNaN(parseFloat(self.searchterm_two.split(' ').slice(-1))))
+            if (!isNaN(self.searchterm_two.split(' ').slice(-1)) && !isNaN(parseFloat(self.searchterm_two.split(' ').slice(-1))))
             {
               self.geocode(self.searchterm_two)
             }
