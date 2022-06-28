@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import Sidebar from "/components/sidebar";
+import Sidebar from "components/sidebar";
 
 import Routeshow from "./components/routeshow";
 
