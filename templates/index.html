@@ -495,6 +495,7 @@
 
         document.getElementById("sidebar-search_two").value = "";
         this.searchterm_two = ""
+        this.transportterm_two_bool = true;
         document.getElementById("Bpcross").style.display = "none";
         document.getElementById('second_column').style.display = "none";
       },
@@ -502,6 +503,7 @@
 
         document.getElementById("sidebar-search").value = "";
         this.searchterm = ""
+        this.transportterm_bool = true;
         document.getElementById("Apcross").style.display = "none";
         document.getElementById('first_column').style.display = "none";
       },
@@ -619,8 +621,8 @@
               })
             }
             EventBus.$emit('gotAPI');
-            self.transportterm_two_bool = true;
-            self.transportterm_bool = true;
+            self.transportterm_two_bool = false;
+            self.transportterm_bool = false;
           })
           .catch(err => {
             console.log(err);
@@ -653,7 +655,7 @@
         this.searchterm = stop.name;
         store.state.startTramStopLatLng = [stop.latitude, stop.longitude];
         store.state.startPointLatLng = [stop.latitude, stop.longitude]
-        self.transportterm_bool = true
+        self.transportterm_bool = false
         EventBus.$emit('setStart');
         document.getElementById('first_column').style.display = "none";
       },
@@ -662,7 +664,7 @@
         this.searchterm_two = stop.name;
         store.state.stopTramStopLatLng = [stop.latitude, stop.longitude];
         store.state.endPointLatLng = [stop.latitude, stop.longitude]
-        self.transportterm_bool = true
+        self.transportterm_two_bool = false
         EventBus.$emit('setEnd');
         document.getElementById('second_column').style.display = "none";
       }
