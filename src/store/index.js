@@ -1,22 +1,11 @@
-import Vue from "vue";
-import Vuex from "vuex";
+import Vue from 'vue'
+import Vuex from 'vuex'
+import messages from './modules/messages'
 
-Vue.use(Vuex);
+Vue.use(Vuex)
 
 export default new Vuex.Store({
-  state:  {
-    walkvals: [],
-    startTramStop: "",
-    endTramStop: "",
-    startTramStopLatLng: [],
-    stopTramStopLatLng: [],
-    routeChapterArray: null,
-    startPointLatLng: ['', ''],
-    endPointLatLng: ['', ''],
-    pickedLatLng: [],
-    mouselatlng: []
-  },
-  mutations: {},
-  actions: {},
-  modules: {},
-});
+  modules: {
+    messages
+  }
+})
