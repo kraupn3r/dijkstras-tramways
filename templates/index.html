@@ -31,18 +31,18 @@
 </body>
 
 <script type="text/javascript">
-  var icon = L.divIcon({
+  const icon = L.divIcon({
     className: 'map-marker',
     iconSize: [10, 10],
 
   });
-  var bigicon = L.divIcon({
+  const bigicon = L.divIcon({
     className: 'map-markerbig',
     iconSize: [23, 23],
 
 
   });
-  var bigendicon = L.divIcon({
+  const bigendicon = L.divIcon({
     className: 'map-markerend',
     iconSize: [23, 23],
 
@@ -53,8 +53,6 @@
   var store = {
     state: {
       walkvals: [],
-      startTramStop: "",
-      endTramStop: "",
       startTramStopLatLng: [],
       stopTramStopLatLng: [],
       routeChapterArray: null,
@@ -85,15 +83,15 @@
         popuplayer: L.featureGroup(),
         sharedState: store.state,
         center: [52.233, 21.00],
-        markerLatLng: L.latLng(51.504, -0.159),
       }
     },
     mounted() {
       var self = this
       mapObject = self.$refs.mapa.mapObject
-      // var map = new L.map("map-container",{ zoomControl: false });
 
-   new L.Control.Zoom({ position: 'topright' }).addTo(mapObject);
+      new L.Control.Zoom({
+        position: 'topright'
+      }).addTo(mapObject);
       self.polylines.addTo(mapObject);
       self.routemarkers.addTo(mapObject);
       self.startsetmarkers.addTo(mapObject);
@@ -101,14 +99,9 @@
       self.popuplayer.addTo(mapObject);
       self.routemarkers.clearLayers();
 
-
-
       mapObject.addEventListener('mousemove', function(ev) {
         store.state.mouselatlng = [ev.latlng.lat, ev.latlng.lng]
       });
-
-
-
 
       //place marker on chosen TramStop's location
       EventBus.$on('setStart', () => {
@@ -131,33 +124,34 @@
 
       document.getElementById("mapId").addEventListener("contextmenu", function(event) {
         event.preventDefault();
-        if (!store.state.maplock){
+        if (!store.state.maplock) {
 
-        store.state.pickedLatLng = store.state.mouselatlng
-        self.popuplayer.clearLayers();
+          store.state.pickedLatLng = store.state.mouselatlng
+          self.popuplayer.clearLayers();
 
-        var popupContent1 = '<div><div id="butstart"><span class="starticona diricon"></span>set start here</div><div id="butend"><span class="starticonb diricon"></span>set end here</div></div>';
+          var popupContent1 = '<div><div id="butstart"><span class="starticona diricon"></span>set start here</div><div id="butend"><span class="starticonb diricon"></span>set end here</div></div>';
 
-        popup1 = new L.Popup();
-        popup1.setLatLng(store.state.pickedLatLng);
-        popup1.setContent(popupContent1);
-        popup1.addTo(self.popuplayer)
-        document.getElementById("butstart").addEventListener("click", function() {
-          self.startsetmarkers.clearLayers();
-          self.dropStartMarker(store.state.pickedLatLng, self.startsetmarkers);
-          EventBus.$emit('pickStartPointLatLng');
-          popup1.remove()
-        })
-        document.getElementById("butend").addEventListener("click", function() {
-          self.endsetmarkers.clearLayers();
-          self.dropStopMarker(store.state.pickedLatLng, self.endsetmarkers)
+          popup1 = new L.Popup();
+          popup1.setLatLng(store.state.pickedLatLng);
+          popup1.setContent(popupContent1);
+          popup1.addTo(self.popuplayer)
+          document.getElementById("butstart").addEventListener("click", function() {
+            self.startsetmarkers.clearLayers();
+            self.dropStartMarker(store.state.pickedLatLng, self.startsetmarkers);
+            EventBus.$emit('pickStartPointLatLng');
+            popup1.remove()
+          })
+          document.getElementById("butend").addEventListener("click", function() {
+            self.endsetmarkers.clearLayers();
+            self.dropStopMarker(store.state.pickedLatLng, self.endsetmarkers)
 
-          EventBus.$emit('pickEndPointLatLng');
-          popup1.remove()
+            EventBus.$emit('pickEndPointLatLng');
+            popup1.remove()
 
-        })
-        return false;
-      }})
+          })
+          return false;
+        }
+      })
 
 
       EventBus.$on('gotAPI', () => {
@@ -167,7 +161,7 @@
         self.startsetmarkers.clearLayers();
         self.endsetmarkers.clearLayers();
         self.dropStartMarker(store.state.routeChapterArray[0].stopslist[0][0], self.startsetmarkers)
-        self.dropStopMarker(store.state.routeChapterArray[store.state.routeChapterArray.length-1].stopslist[store.state.routeChapterArray[store.state.routeChapterArray.length-1].stopslist.length-1][0], self.endsetmarkers)
+        self.dropStopMarker(store.state.routeChapterArray[store.state.routeChapterArray.length - 1].stopslist[store.state.routeChapterArray[store.state.routeChapterArray.length - 1].stopslist.length - 1][0], self.endsetmarkers)
 
 
 
@@ -221,7 +215,7 @@
         stopMarker.getElement().style.backgroundColor = 'white';
 
       },
-      async reversegeo(latlng){
+      async reversegeo(latlng) {
         axios.get('https://nominatim.openstreetmap.org/reverse?', {
             params: {
               format: 'json',
@@ -230,9 +224,10 @@
             }
           })
           .then(response => response.data)
-            .then(data => { console.log(data.address.road,data.address.house_number )
-            })
-          .catch(function (error) {
+          .then(data => {
+            console.log(data.address.road, data.address.house_number)
+          })
+          .catch(function(error) {
             console.log(error);
           })
       },
@@ -335,8 +330,7 @@
           if (self.currtime != self.lasttime && self.starttrip > 0) {
             self.lasttime = self.currtime;
             self.starttrip -= 1;
-          }
-          else if (self.starttrip == 0){
+          } else if (self.starttrip == 0) {
             EventBus.$emit('timesup');
           }
         }, 5000)
@@ -349,17 +343,13 @@
       },
       openStops(index) {
         document.getElementById(index).style.display = "block";
-
         document.getElementById('open' + index).style.display = "None";
       },
       closeStops(index) {
         document.getElementById(index).style.display = "None";
-
         document.getElementById('open' + index).style.display = "block";
       }
     },
-
-
   })
 
 
@@ -371,43 +361,45 @@
         searchterm_two: '',
         transportterm_bool: true,
         transportterm_two_bool: true,
-        display_first:'',
-        display_second:'',
+        display_first: '',
+        display_second: '',
         timeout: null,
         sharedState: store.state,
         searchset: [],
-        searchset_two: []
+        searchset_two: [],
+        geocode_response:[]
       }
     },
     mounted() {
       const self = this
-      EventBus.$on('fetchh',() =>{
-
+      EventBus.$on('fetchh', () => {
         self.fetchAPIData()
+      });
 
-      });      EventBus.$on('lock',() =>{
+      EventBus.$on('lock', () => {
         document.getElementById('find-route').disabled = true;
         document.getElementById("sidebar-search").disabled = true;
         document.getElementById("sidebar-search_two").disabled = true;
         store.state.maplock = true;
       });
-      EventBus.$on('unlock',() =>{
+
+      EventBus.$on('unlock', () => {
         document.getElementById('find-route').disabled = false;
         document.getElementById("sidebar-search").disabled = false;
         document.getElementById("sidebar-search_two").disabled = false;
         store.state.maplock = false;
       });
+
       EventBus.$on('pickStartPointLatLng', () => {
         self.reversegeo(store.state.pickedLatLng)
         self.transportterm_bool = false
-        store.state.startTramStop = ""
         store.state.startPointLatLng = store.state.pickedLatLng
-       EventBus.$emit('lock');
+        EventBus.$emit('lock');
       });
+
       EventBus.$on('pickEndPointLatLng', () => {
         self.reversegeo2(store.state.pickedLatLng)
         self.transportterm_two_bool = false
-        store.state.endTramStop = ""
         store.state.endPointLatLng = store.state.pickedLatLng
 
         EventBus.$emit('lock');
@@ -421,13 +413,26 @@
       searchterm_two() {
         this.second_col_watch(this.searchterm_two)
       },
-       display_first() {
-      this.searchterm = this.display_first
-    },
-    display_second(){
-      this.searchterm_two = this.display_second
-    }
-  },
+      display_first() {
+        this.searchterm = this.display_first
+      },
+      display_second() {
+        this.searchterm_two = this.display_second
+      },
+      geocode_response(){
+      this.geocode_response.every(e =>{
+        if(e.class == 'building'){
+          this.searchset_two.unshift({
+            "name" : e.display_name.split(',').slice(0,3).toString(),
+            "latitude": e.lat,
+            'longitude': e.lon
+          })
+          return true
+        }
+        return false
+      })
+
+    }},
     template:
 
       `
@@ -459,37 +464,39 @@
         </div>
     `,
     methods: {
-      async reversegeo(latlng){
-         const response = await axios.get('https://nominatim.openstreetmap.org/reverse?', {
-            params: {
-              format: 'json',
-              lat: latlng[0],
-              lon: latlng[1],
-            }
-          })
-          this.display_first = response.data.address.road
-          if (response.data.address.house_number) {
-            this.display_first += ' ' + response.data.address.house_number
-}            EventBus.$emit('unlock');
-            if (self.sharedState.endPointLatLng[0] != ''){
-              EventBus.$emit('fetchh');
-            }
-      },
-      async reversegeo2(latlng){
-         const response = await axios.get('https://nominatim.openstreetmap.org/reverse?', {
-            params: {
-              format: 'json',
-              lat: latlng[0],
-              lon: latlng[1],
-            }
-          })
-          this.display_second = response.data.address.road
-          if (response.data.address.house_number) {
-            this.display_second += ' ' + response.data.address.house_number
-}          EventBus.$emit('unlock');
-          if (self.sharedState.startPointLatLng[0] != ''){
-            EventBus.$emit('fetchh');
+      async reversegeo(latlng) {
+        const response = await axios.get('https://nominatim.openstreetmap.org/reverse?', {
+          params: {
+            format: 'json',
+            lat: latlng[0],
+            lon: latlng[1],
           }
+        })
+        this.display_first = response.data.address.road
+        if (response.data.address.house_number) {
+          this.display_first += ' ' + response.data.address.house_number
+        }
+        EventBus.$emit('unlock');
+        if (self.sharedState.endPointLatLng[0] != '') {
+          EventBus.$emit('fetchh');
+        }
+      },
+      async reversegeo2(latlng) {
+        const response = await axios.get('https://nominatim.openstreetmap.org/reverse?', {
+          params: {
+            format: 'json',
+            lat: latlng[0],
+            lon: latlng[1],
+          }
+        })
+        this.display_second = response.data.address.road
+        if (response.data.address.house_number) {
+          this.display_second += ' ' + response.data.address.house_number
+        }
+        EventBus.$emit('unlock');
+        if (self.sharedState.startPointLatLng[0] != '') {
+          EventBus.$emit('fetchh');
+        }
       },
       clear_Binput() {
 
@@ -519,9 +526,17 @@
           if (self.searchterm.length > 1 && self.transportterm_bool !== false) {
             document.getElementById('first_column').style.display = "block";
             self.searchset = self.FetchSearchStops(self.searchterm, '');
-          } else if (self.searchterm.length == 0 && {{fromlist}}.length > 0) {
+          } else if (self.searchterm.length == 0 && {
+              {
+                fromlist
+              }
+            }.length > 0) {
             document.getElementById('first_column').style.display = "block";
-            self.searchset = self.FetchSearchStops('', {{fromlist}});
+            self.searchset = self.FetchSearchStops('', {
+              {
+                fromlist
+              }
+            });
           }
         }, 1000);
       },
@@ -539,14 +554,12 @@
           } else if (self.searchterm_two.length == 0 && {{tolist}}.length > 0) {
             document.getElementById('second_column').style.display = "block";
             self.searchset_two = self.FetchSearchStops('', {{tolist}});
-
           }
         }, 1000);
       },
       async geocode(term){
-   const response = await axios.get('https://nominatim.openstreetmap.org/search?q='+term+',warszawa&format=json')
-   console.log(response.data)
-    // this.searchset_two.unshift(response.data[0].display_name)
+    const response = await axios.get('https://nominatim.openstreetmap.org/search?q='+term+',warszawa&format=json')
+    this.geocode_response = response.data
 },
       fetchAPIData() {
         EventBus.$emit('lock');
@@ -638,20 +651,19 @@
             }
           })
           .then(response => response.data)
-            .then(data => {
-              window.data = data;
-              Object.values(window.data).forEach(k => {
-                stoparray.push(k);
-              })
+          .then(data => {
+            window.data = data;
+            Object.values(window.data).forEach(k => {
+              stoparray.push(k);
             })
-          .catch(function (error) {
+          })
+          .catch(function(error) {
             console.log(error);
           })
 
         return stoparray
       },
       pickStartingPoint(stop) {
-        store.state.startTramStop = stop.id;
         this.searchterm = stop.name;
         store.state.startTramStopLatLng = [stop.latitude, stop.longitude];
         store.state.startPointLatLng = [stop.latitude, stop.longitude]
@@ -660,7 +672,6 @@
         document.getElementById('first_column').style.display = "none";
       },
       pickEndingPoint(stop) {
-        store.state.endTramStop = stop.id;
         this.searchterm_two = stop.name;
         store.state.stopTramStopLatLng = [stop.latitude, stop.longitude];
         store.state.endPointLatLng = [stop.latitude, stop.longitude]
