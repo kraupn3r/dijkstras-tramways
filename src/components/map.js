@@ -1,5 +1,5 @@
 <template>
-  <l-map ref='mapa' id="mapId"  style="height: 100%" :options="{ zoomControl: false }" :zoom="zoom" :center="center">
+  <l-map ref='mapa' id="mapId" @click="mouseOut" style="height: 100%" :options="{ zoomControl: false }" :zoom="zoom" :center="center">
     <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
     <l-marker :lat-lng="markerLatLng"></l-marker>
   </l-map>

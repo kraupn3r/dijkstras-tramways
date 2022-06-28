@@ -9,8 +9,9 @@
 </template>
 
 <script>
-import Map from "./components/map";
 import Sidebar from "./components/sidebar";
+import Map from "./components/map";
+
 import Routeshow from "./components/routeshow";
 
 
