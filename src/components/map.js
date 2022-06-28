@@ -5,12 +5,13 @@
 
 <script>
 import L from 'leaflet';
-import { LMap, LTileLayer, LMarker } from "@vue-leaflet/vue-leaflet";
+import { LMap, LTileLayer, LMarker } from "vue2-leaflet";
+import "leaflet/dist/leaflet.css";
 export default {
   name: "Map",
   components: {
-    LMap,
-    LTileLayer,
+    "l-map": LMap,
+    "l-tile-layer": LTileLayer,
     LMarker
   },
   data() {
