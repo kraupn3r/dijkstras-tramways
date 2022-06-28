@@ -655,7 +655,7 @@
         this.searchterm = stop.name;
         store.state.startTramStopLatLng = [stop.latitude, stop.longitude];
         store.state.startPointLatLng = [stop.latitude, stop.longitude]
-        self.transportterm_bool = false
+        this.transportterm_bool = false
         EventBus.$emit('setStart');
         document.getElementById('first_column').style.display = "none";
       },
@@ -664,7 +664,7 @@
         this.searchterm_two = stop.name;
         store.state.stopTramStopLatLng = [stop.latitude, stop.longitude];
         store.state.endPointLatLng = [stop.latitude, stop.longitude]
-        self.transportterm_two_bool = false
+        this.transportterm_two_bool = false
         EventBus.$emit('setEnd');
         document.getElementById('second_column').style.display = "none";
       }
