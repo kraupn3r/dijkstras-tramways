@@ -10,8 +10,8 @@
 
 <script>
 import Map from "./components/map";
-import Sidebar from "./components/Sidebar";
-import Routeshow from "./components/Routeshow";
+import Sidebar from "./components/sidebar";
+import Routeshow from "./components/routeshow";
 
 
 
