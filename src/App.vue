@@ -10,7 +10,7 @@
 
 <script>
 import Sidebar from "@/components/sidebar";
-import map from "@/components/map";
+import Map from "@/components/map";
 import Routeshow from "@/components/routeshow";
 
 
@@ -19,7 +19,8 @@ export default {
   name: "App",
   components: {
     routeshow,
-    sidebar
+    sidebar,
+    Map
   }
 };
 </script>
