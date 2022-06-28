@@ -9,9 +9,9 @@
 </template>
 
 <script>
-import sidebar from "./components/sidebar";
+import sidebar from "./components/sidebar.js";
 
-import routeshow from "./components/routeshow";
+import routeshow from "./components/routeshow.js";
 
 
 
