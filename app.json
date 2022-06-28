@@ -1,8 +1,8 @@
 {
-    "name": "Dijkstras Tramways",
+    "name": "Django VueJs Template",
     "description": "",
-    "repository": "https://github.com/kraupn3r/dijkstras-tramways",
-    "keywords": ["django", "template", "django rest framework"],
+    "repository": "https://github.com/gtalarico/django-vue-template",
+    "keywords": ["django", "vue", "vuejs", "template", "django rest framework"],
     "env": {
       "DJANGO_SETTINGS_MODULE": {
         "description": "Set Django Settings to Production",
@@ -10,15 +10,16 @@
       }
      },
      "engines": {
-   "yarn": "1.4.0",
-},
+        "yarn": "1.4.0",
+        "npm": "6.2.0"
+     },
     "addons": [
 
      ],
      "buildpacks": [
        {
-  "url": "heroku/nodejs"
- },
+         "url": "heroku/nodejs"
+        },
         {
           "url": "heroku/python"
         }
