@@ -9,17 +9,17 @@
 </template>
 
 <script>
-import Sidebar from "./components/sidebar";
+import sidebar from "./components/sidebar";
 
-import Routeshow from "./components/routeshow";
+import routeshow from "./components/routeshow";
 
 
 
 export default {
   name: "App",
   components: {
-    Routeshow,
-    Sidebar
+    routeshow,
+    sidebar
   }
 };
 </script>
