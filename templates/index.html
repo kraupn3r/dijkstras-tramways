@@ -419,15 +419,26 @@
         this.searchterm_two = this.display_second
       },
       geocode_response(){
+        self = this
       this.geocode_response.every(e =>{
         if(e.class == 'building'){
+          if(!self.transportterm_bool){
           this.searchset_two.unshift({
             "type": "building",
             "name" : e.display_name.split(',').slice(0,3).toString(),
             "latitude": e.lat,
             'longitude': e.lon
           })
-          return false
+          return false}
+          else{
+            this.searchset.unshift({
+              "type": "building",
+              "name" : e.display_name.split(',').slice(0,3).toString(),
+              "latitude": e.lat,
+              'longitude': e.lon
+            })
+            return false}
+          }
         }
         return true
       })
@@ -526,6 +537,10 @@
           if (self.searchterm.length > 1 && self.transportterm_bool !== false) {
             document.getElementById('first_column').style.display = "block";
             self.searchset = self.FetchSearchStops(self.searchterm, '');
+            if (!isNaN(self.searchterm_two.split(' ').slice(-1)) && !isNaN(parseFloat(self.searchterm_two.split(' ').slice(-1))))
+            {
+              self.geocode(self.searchterm)
+            }
           } else if (self.searchterm.length == 0 && {{fromlist}}.length > 0) {
             document.getElementById('first_column').style.display = "block";
             self.searchset = self.FetchSearchStops('', {{fromlist}});
