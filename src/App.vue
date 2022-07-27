@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+   <div id="app">
     <Map/>
     <sidebar id="sidebar"></sidebar>
     <routeshow></routeshow>
@@ -9,17 +9,19 @@
 </template>
 
 <script>
-import Sidebar from "components/sidebar";
-
-import Routeshow from "./components/routeshow";
-
-
-
+import Sidebar from "./components/Sidebar";
+import Map from "./components/map"; 
+import Routeshow from "./components/Routeshow";
 export default {
-  name: "App",
+  name: 'App',
   components: {
-    routeshow,
-    sidebar
+     Routeshow,
+    Map,
+    Sidebar,
   }
-};
+}
 </script>
+
+<style>
+@import './assets/css/style.css'; 
+</style>

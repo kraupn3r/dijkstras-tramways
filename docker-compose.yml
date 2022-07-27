@@ -33,7 +33,6 @@ services:
       context: .
       dockerfile: docker/FrontendDockerfile
     container_name: dijkstras-tramways-frontend
-    command: ./docker/frontend_setup.sh
     # volumes:
     #   - .:/app
     ports:

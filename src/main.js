@@ -1,8 +1,6 @@
 import Vue from "vue";
-import VueRouter from "vue-router";
 import App from "./App.vue";
 import store from "./store"
-import router from "./router";
 // import { Icon } from "leaflet";
 
 // import VueCookies from 'vue-cookies';
@@ -14,7 +12,7 @@ import router from "./router";
 //   shadowUrl: require("leaflet/dist/images/marker-shadow.png")
 // });
 //
-
+export const EventBus = new Vue();
 // Vue.use(VueRouter);
 // Vue.use(VueCookies);
 new Vue({
